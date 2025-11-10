@@ -6,6 +6,8 @@ import { gsap } from 'gsap';
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,6 +68,73 @@ export default function Header() {
                 AI4Tourism
               </h1>
               <div className="h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="hidden md:flex items-center mx-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Cerca destinazioni, attività..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setShowSearchResults(true)}
+                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                className="w-64 px-4 py-2 pl-10 rounded-full border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white/90 backdrop-blur-sm"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              {/* Search Results Dropdown */}
+              {showSearchResults && searchQuery && (
+                <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-50">
+                  <div className="p-2">
+                    <div className="text-xs text-gray-500 mb-2 px-2">Risultati per "{searchQuery}"</div>
+                    {['Roma', 'Firenze', 'Venezia', 'Napoli', 'Milano'].filter(item =>
+                      item.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map((result) => (
+                      <button
+                        key={result}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded transition-colors duration-200"
+                        onClick={() => {
+                          setSearchQuery(result);
+                          setShowSearchResults(false);
+                          // Scroll to map and search for the location
+                          const mapSection = document.getElementById('map');
+                          if (mapSection) {
+                            mapSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                      >
+                        📍 {result}
+                      </button>
+                    ))}
+                    {['Visita ai Monumenti', 'Degustazione di Vini', 'Escursioni in Natura'].filter(item =>
+                      item.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map((result) => (
+                      <button
+                        key={result}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded transition-colors duration-200"
+                        onClick={() => {
+                          setSearchQuery(result);
+                          setShowSearchResults(false);
+                          // Scroll to activities section
+                          const activitiesSection = document.getElementById('things-to-do');
+                          if (activitiesSection) {
+                            activitiesSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                      >
+                        🎯 {result}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

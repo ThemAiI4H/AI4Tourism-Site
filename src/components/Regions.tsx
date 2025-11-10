@@ -112,7 +112,29 @@ export default function Regions() {
                   ))}
                 </div>
 
-                <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300">
+                <button
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300"
+                  onClick={() => {
+                    // Navigate to the main city of the region
+                    const cityMap: { [key: string]: string } = {
+                      'Toscana': 'firenze',
+                      'Veneto': 'venezia',
+                      'Lazio': 'roma',
+                      'Campania': 'napoli'
+                    };
+
+                    const citySlug = cityMap[region.name];
+                    if (citySlug) {
+                      window.location.href = `/destinations/${citySlug}`;
+                    } else {
+                      // Fallback to map
+                      const mapSection = document.getElementById('map');
+                      if (mapSection) {
+                        mapSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }
+                  }}
+                >
                   Explore {region.name}
                 </button>
               </div>

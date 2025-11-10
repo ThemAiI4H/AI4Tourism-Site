@@ -218,7 +218,23 @@ export default function MapSection() {
                             </span>
                           ))}
                         </div>
-                        <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm">
+                        <button
+                          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm"
+                          onClick={() => {
+                            const slugMap: { [key: string]: string } = {
+                              'Roma': 'roma',
+                              'Firenze': 'firenze',
+                              'Venezia': 'venezia',
+                              'Napoli': 'napoli',
+                              'Milano': 'milano',
+                              'Pisa': 'pisa'
+                            };
+                            const slug = slugMap[location.name];
+                            if (slug) {
+                              window.location.href = `/destinations/${slug}`;
+                            }
+                          }}
+                        >
                           Scopri di Più
                         </button>
                       </div>
@@ -264,7 +280,23 @@ export default function MapSection() {
               <h3 className="font-bold text-lg text-gray-900 mb-2">{selectedLocation.name}</h3>
               <p className="text-sm text-gray-600 mb-3">{selectedLocation.region}</p>
               <p className="text-sm text-gray-700 mb-3">{selectedLocation.description}</p>
-              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm">
+              <button
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm"
+                onClick={() => {
+                  const slugMap: { [key: string]: string } = {
+                    'Roma': 'roma',
+                    'Firenze': 'firenze',
+                    'Venezia': 'venezia',
+                    'Napoli': 'napoli',
+                    'Milano': 'milano',
+                    'Pisa': 'pisa'
+                  };
+                  const slug = slugMap[selectedLocation.name];
+                  if (slug) {
+                    window.location.href = `/destinations/${slug}`;
+                  }
+                }}
+              >
                 Scopri di Più
               </button>
             </div>

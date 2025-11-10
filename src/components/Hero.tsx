@@ -73,7 +73,15 @@ export default function Hero() {
         <p className="hero-subtitle text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed">
           Explore the breathtaking landscapes, rich history, and vibrant culture of the beautiful Italian regions
         </p>
-        <button className="hero-cta bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-colors duration-300">
+        <button
+          className="hero-cta bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-colors duration-300"
+          onClick={() => {
+            const mapSection = document.getElementById('map');
+            if (mapSection) {
+              mapSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        >
           Start Your Journey
         </button>
       </div>

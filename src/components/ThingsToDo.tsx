@@ -103,7 +103,20 @@ export default function ThingsToDo() {
                 <p className="text-gray-600 text-sm leading-relaxed mb-4">
                   {activity.description}
                 </p>
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm">
+                <button
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300 text-sm"
+                  onClick={() => {
+                    // Scroll to map section and highlight related locations
+                    const mapSection = document.getElementById('map');
+                    if (mapSection) {
+                      mapSection.scrollIntoView({ behavior: 'smooth' });
+                      // Could highlight specific locations based on activity type
+                      setTimeout(() => {
+                        alert(`${activity.title}\n\n${activity.description}\n\nVisita la mappa interattiva per esplorare le destinazioni!`);
+                      }, 1000);
+                    }
+                  }}
+                >
                   Scopri di Più
                 </button>
               </div>

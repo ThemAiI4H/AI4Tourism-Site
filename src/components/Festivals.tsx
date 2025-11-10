@@ -120,10 +120,26 @@ export default function Festivals() {
                   {festival.description}
                 </p>
                 <div className="flex gap-3">
-                  <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-300">
+                  <button
+                    className="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-300"
+                    onClick={() => {
+                      alert(`🎪 ${festival.title}\n\n📅 ${festival.date}\n📍 ${festival.location}\n\n${festival.description}\n\nPartecipazione al festival in arrivo! Visita la mappa per raggiungere ${festival.location}.`);
+                    }}
+                  >
                     Partecipa
                   </button>
-                  <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-300">
+                  <button
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-300"
+                    onClick={() => {
+                      const mapSection = document.getElementById('map');
+                      if (mapSection) {
+                        mapSection.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                          alert(`🎭 Scopri ${festival.title}\n\n📅 ${festival.date}\n📍 ${festival.location}\n\n${festival.description}\n\nVisita la mappa interattiva per pianificare il viaggio!`);
+                        }, 1000);
+                      }
+                    }}
+                  >
                     Scopri
                   </button>
                 </div>
@@ -133,7 +149,18 @@ export default function Festivals() {
         </div>
 
         <div className="text-center mt-12">
-          <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
+          <button
+            className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
+            onClick={() => {
+              const mapSection = document.getElementById('map');
+              if (mapSection) {
+                mapSection.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                  alert('🎪 Tutti gli Eventi Italiani\n\nVisita la mappa interattiva per scoprire festival e eventi in ogni regione!\n\n• Carnevale di Venezia\n• Palio di Siena\n• Festival dei Due Mondi\n• Notte della Taranta\n• E molti altri...');
+                }, 1000);
+              }
+            }}
+          >
             Vedi Tutti gli Eventi
           </button>
         </div>

@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Host
+Host: https://ai4tourism.com
+
+# Sitemaps
+Sitemap: https://ai4tourism.com/sitemap.xml
+Sitemap: https://ai4tourism.com/server-sitemap.xml
