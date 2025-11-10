@@ -1,267 +1,225 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const destinations = [
   {
     name: 'Roma',
-    image: 'https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=300&h=300&fit=crop',
     description: 'Capitale eterna'
   },
   {
     name: 'Venezia',
-    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=300&h=300&fit=crop',
     description: 'Città dei canali'
   },
   {
     name: 'Firenze',
-    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=300&h=300&fit=crop',
     description: 'Culla del Rinascimento'
   },
   {
     name: 'Milano',
-    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
     description: 'Capitale della moda'
   },
   {
     name: 'Napoli',
-    image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=300&h=300&fit=crop',
     description: 'Città partenopea'
   },
   {
     name: 'Amalfi',
-    image: 'https://images.unsplash.com/photo-1602347174589-4e4f96346b4c?w=512&h=512&fit=crop',
+    image: 'https://images.unsplash.com/photo-1602347174589-4e4f96346b4c?w=300&h=300&fit=crop',
     description: 'Costa divina'
   }
 ];
 
 export default function ItalyCube() {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const [selectedFace, setSelectedFace] = useState<string | null>(null);
-  const [isRotating, setIsRotating] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<typeof destinations[0] | null>(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    if (!isDragging) {
+      // Auto rotation when not dragging
+      const interval = setInterval(() => {
+        setRotation(prev => ({
+          x: prev.x + 0.5,
+          y: prev.y + 0.3
+        }));
+      }, 50);
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+      return () => clearInterval(interval);
+    }
+  }, [isDragging]);
 
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance"
-    });
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
 
-    renderer.setSize(400, 400);
-    renderer.setClearColor(0x000000, 0);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
+    setRotation(prev => ({
+      x: prev.x + deltaY * 0.5,
+      y: prev.y + deltaX * 0.5
+    }));
 
-    const pointLight = new THREE.PointLight(0x4169E1, 0.5);
-    pointLight.position.set(-5, -5, 5);
-    scene.add(pointLight);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
 
-    // Cube geometry with higher detail
-    const geometry = new THREE.BoxGeometry(3, 3, 3, 32, 32, 32);
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
-    // Load textures for each face with higher quality
-    const loader = new THREE.TextureLoader();
-    const materials = destinations.map((dest) => {
-      const texture = loader.load(dest.image);
-      texture.wrapS = THREE.ClampToEdgeWrapping;
-      texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
+  // Calculate which face is visible based on rotation
+  const getVisibleFace = () => {
+    const x = (rotation.x % 360 + 360) % 360;
+    const y = (rotation.y % 360 + 360) % 360;
 
-      return new THREE.MeshLambertMaterial({
-        map: texture,
-        transparent: false,
-        side: THREE.FrontSide
-      });
-    });
+    // Simplified face detection
+    if (x > 315 || x <= 45) return 0; // Front
+    if (x > 45 && x <= 135) return 1; // Right
+    if (x > 135 && x <= 225) return 2; // Back
+    if (x > 225 && x <= 315) return 3; // Left
+    return 4; // Top/Bottom
+  };
 
-    // Create cube mesh
-    const cube = new THREE.Mesh(geometry, materials);
-    cube.castShadow = true;
-    cube.receiveShadow = true;
-    scene.add(cube);
-
-    camera.position.z = 6;
-
-    // Mouse interaction variables
-    let isMouseDown = false;
-    let previousMousePosition = { x: 0, y: 0 };
-    let rotationSpeed = { x: 0, y: 0 };
-
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      if (!isMouseDown) {
-        // Apply momentum
-        cube.rotation.x += rotationSpeed.x * 0.95;
-        cube.rotation.y += rotationSpeed.y * 0.95;
-
-        // Dampen rotation speed
-        rotationSpeed.x *= 0.95;
-        rotationSpeed.y *= 0.95;
-
-        // Auto rotation when not interacting
-        if (Math.abs(rotationSpeed.x) < 0.001 && Math.abs(rotationSpeed.y) < 0.001) {
-          cube.rotation.x += 0.002;
-          cube.rotation.y += 0.001;
-        }
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Mouse event handlers
-    const handleMouseDown = (event: MouseEvent) => {
-      isMouseDown = true;
-      setIsRotating(true);
-      previousMousePosition = {
-        x: event.clientX,
-        y: event.clientY
-      };
-      rotationSpeed = { x: 0, y: 0 };
-      document.body.style.cursor = 'grabbing';
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isMouseDown) return;
-
-      const deltaX = event.clientX - previousMousePosition.x;
-      const deltaY = event.clientY - previousMousePosition.y;
-
-      cube.rotation.y += deltaX * 0.005;
-      cube.rotation.x += deltaY * 0.005;
-
-      // Store rotation speed for momentum
-      rotationSpeed.x = deltaY * 0.005;
-      rotationSpeed.y = deltaX * 0.005;
-
-      previousMousePosition = {
-        x: event.clientX,
-        y: event.clientY
-      };
-
-      // Determine which face is facing the camera
-      const faceIndex = getFacingFace(cube.rotation);
-      const faceDestination = destinations[faceIndex];
-      setSelectedFace(faceDestination?.name || null);
-    };
-
-    const handleMouseUp = () => {
-      isMouseDown = false;
-      setIsRotating(false);
-      document.body.style.cursor = 'grab';
-    };
-
-    const handleMouseLeave = () => {
-      if (isMouseDown) {
-        handleMouseUp();
-      }
-    };
-
-    // Helper function to determine which face is facing the camera
-    const getFacingFace = (rotation: THREE.Euler) => {
-      const normalizedX = ((rotation.x % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-      const normalizedY = ((rotation.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-
-      // Determine face based on rotation
-      const xFace = Math.round(normalizedX / (Math.PI / 2)) % 4;
-      const yFace = Math.round(normalizedY / (Math.PI / 2)) % 4;
-
-      // Simplified face detection
-      if (Math.abs(Math.sin(rotation.x)) > Math.abs(Math.cos(rotation.x))) {
-        return Math.abs(Math.sin(rotation.x)) > Math.abs(Math.sin(rotation.y)) ? (rotation.x > 0 ? 4 : 5) : (rotation.y > 0 ? 2 : 3);
-      } else {
-        return Math.abs(Math.cos(rotation.x)) > Math.abs(Math.cos(rotation.y)) ? (rotation.x > Math.PI/2 ? 0 : 1) : (rotation.y > 0 ? 2 : 3);
-      }
-    };
-
-    // Add event listeners
-    const canvas = renderer.domElement;
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseup', handleMouseUp);
-    canvas.addEventListener('mouseleave', handleMouseLeave);
-
-    // Touch events for mobile
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      handleMouseDown(touch as any);
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      handleMouseMove(touch as any);
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      handleMouseUp();
-    });
-
-    // Cleanup
-    return () => {
-      if (mountRef.current) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-      materials.forEach(material => {
-        if (material.map) material.map.dispose();
-      });
-      geometry.dispose();
-    };
-  }, []);
+  useEffect(() => {
+    const visibleFace = getVisibleFace();
+    if (visibleFace >= 0 && visibleFace < destinations.length) {
+      setSelectedDestination(destinations[visibleFace]);
+    }
+  }, [rotation]);
 
   return (
     <div className="flex flex-col items-center space-y-6">
-      {/* 3D Cube Container */}
-      <div
-        ref={mountRef}
-        className={`relative cursor-grab transition-all duration-300 ${
-          isRotating ? 'cursor-grabbing scale-105' : ''
-        }`}
-        style={{ width: '400px', height: '400px' }}
-      >
-        {/* Glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-2xl animate-pulse"></div>
+      {/* CSS 3D Cube */}
+      <div className="relative" style={{ perspective: '1000px' }}>
+        <div
+          className={`relative cursor-grab select-none ${isDragging ? 'cursor-grabbing' : ''}`}
+          style={{
+            transformStyle: 'preserve-3d',
+            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+            width: '200px',
+            height: '200px',
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {/* Front face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'translateZ(100px)',
+              backgroundImage: `url(${destinations[0].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[0].name}</span>
+            </div>
+          </div>
 
-        {/* Loading indicator */}
-        <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-          {isRotating ? '🔄 Ruotando...' : '🖱️ Trascina per ruotare'}
+          {/* Back face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'translateZ(-100px) rotateY(180deg)',
+              backgroundImage: `url(${destinations[1].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[1].name}</span>
+            </div>
+          </div>
+
+          {/* Right face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'rotateY(90deg) translateZ(100px)',
+              backgroundImage: `url(${destinations[2].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[2].name}</span>
+            </div>
+          </div>
+
+          {/* Left face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'rotateY(-90deg) translateZ(100px)',
+              backgroundImage: `url(${destinations[3].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[3].name}</span>
+            </div>
+          </div>
+
+          {/* Top face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'rotateX(90deg) translateZ(100px)',
+              backgroundImage: `url(${destinations[4].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[4].name}</span>
+            </div>
+          </div>
+
+          {/* Bottom face */}
+          <div
+            className="absolute w-full h-full border-2 border-white/20 rounded-lg overflow-hidden"
+            style={{
+              transform: 'rotateX(-90deg) translateZ(100px)',
+              backgroundImage: `url(${destinations[5].image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{destinations[5].name}</span>
+            </div>
+          </div>
         </div>
+
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-2xl animate-pulse pointer-events-none"></div>
       </div>
 
       {/* Selected Destination Info */}
-      {selectedFace && (
+      {selectedDestination && (
         <div className="text-center animate-fade-in bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-sm border border-white/20">
-          <h3 className="text-3xl font-bold text-white mb-2">{selectedFace}</h3>
+          <h3 className="text-3xl font-bold text-white mb-2">{selectedDestination.name}</h3>
           <p className="text-gray-300 text-lg">
-            {destinations.find(d => d.name === selectedFace)?.description}
+            {selectedDestination.description}
           </p>
           <button className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-            Esplora {selectedFace}
+            Esplora {selectedDestination.name}
           </button>
         </div>
       )}
@@ -272,7 +230,7 @@ export default function ItalyCube() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
           <p>🖱️ <strong>Trascina</strong> per ruotare</p>
           <p>📱 <strong>Tocca</strong> per dispositivi mobili</p>
-          <p>⚡ <strong>Momentum</strong> fisica realistica</p>
+          <p>⚡ <strong>Rotazione automatica</strong></p>
           <p>🎯 <strong>6 destinazioni</strong> uniche</p>
         </div>
       </div>
