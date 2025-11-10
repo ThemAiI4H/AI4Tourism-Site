@@ -6,7 +6,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import ItalyCube from '@/components/ItalyCube';
-import TimedCard from '@/components/TimedCard';
 import ThingsToDo from '@/components/ThingsToDo';
 import Festivals from '@/components/Festivals';
 import Regions from '@/components/Regions';
@@ -82,7 +81,6 @@ export default function Home() {
       <ThingsToDo />
       <Festivals />
       <Regions />
-      <TimedCard />
       <MapSection />
     </div>
   );
