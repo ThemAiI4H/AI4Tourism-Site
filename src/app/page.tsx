@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import ItalyCube from '@/components/ItalyCube';
+import TimedCard from '@/components/TimedCard';
 import ThingsToDo from '@/components/ThingsToDo';
 import Festivals from '@/components/Festivals';
 import Regions from '@/components/Regions';
@@ -59,23 +60,21 @@ export default function Home() {
       <Hero />
 
       {/* 3D Cube Section */}
-      <section className="section py-20 px-4 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"></div>
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+      <section className="section py-16 px-4 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Esplora l'Italia in 3D
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
               Ruota il cubo interattivo per scoprire le meraviglie d'Italia.
-              Ogni faccia nasconde una destinazione unica.
             </p>
           </div>
 
-          <div className="flex justify-center">
-            <ItalyCube />
+          <div className="flex justify-center items-center min-h-[500px]">
+            <div className="bg-black/20 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
+              <ItalyCube />
+            </div>
           </div>
         </div>
       </section>
@@ -83,6 +82,7 @@ export default function Home() {
       <ThingsToDo />
       <Festivals />
       <Regions />
+      <TimedCard />
       <MapSection />
     </div>
   );
