@@ -3,9 +3,21 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
-import Hero from '@/components/Hero';
 import ItalyCube from '@/components/ItalyCube';
+
+const Hero = dynamic(() => import('@/components/Hero'), {
+  ssr: false,
+  loading: () => (
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+      <div className="text-center text-white">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6">Discover Italy</h1>
+        <p className="text-xl md:text-2xl">Loading...</p>
+      </div>
+    </section>
+  ),
+});
 import ThingsToDo from '@/components/ThingsToDo';
 import Festivals from '@/components/Festivals';
 import Regions from '@/components/Regions';
